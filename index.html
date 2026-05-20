@@ -240,25 +240,8 @@
                     </div>
 
                     <!-- Cột bên phải: Khung hiển thị nội dung cao cấp (Đã điền sẵn trạng thái mặc định) -->
-                    <div class="lg:col-span-2 bg-gradient-to-br from-white to-slate-50/50 rounded-2xl shadow-xl border border-slate-200/80 p-6 md:p-8 min-h-[420px] flex flex-col justify-between transition-all duration-300" id="feature-display">
-                        <div class="flex-1">
-                            <div class="flex items-center justify-between mb-4">
-                                <h3 class="text-2xl font-bold text-primary flex items-center">
-                                    <span class="text-3xl mr-3">🖥️</span> Giám sát từ xa (Chụp màn hình ẩn)
-                                </h3>
-                                <span class="flex items-center gap-1.5 bg-emerald-100 text-emerald-700 text-xs font-bold px-2.5 py-1 rounded-full border border-emerald-200">
-                                    <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span> Hệ thống đang chạy ẩn
-                                </span>
-                            </div>
-                            <p class="text-slate-600 leading-relaxed text-base mb-6">
-                                Hệ thống tự động ghi lại hình ảnh màn hình máy tính theo định kỳ hoàn toàn ẩn danh. Phụ huynh dễ dàng xem lại dòng thời gian hoạt động trực tuyến để biết con đang tập trung học tập hay lướt web giải trí sai mục đích.
-                            </p>
-                        </div>
-                        <div class="mt-auto border-t border-slate-200/60 pt-5">
-                            <div class="text-xs text-slate-400 uppercase font-bold tracking-wider mb-3 flex items-center justify-between">
-                                <span>Mô phỏng cơ chế vận hành hệ thống</span>
-                                <span class="font-mono text-[10px] bg-slate-200 text-slate-600 px-1.5 py-0.5 rounded">Live Preview</span>
-                            </div>
+                    <div class="lg:col-span-2 bg-gradient-to-br from-white to-slate-50/50 rounded-2xl shadow-xl border border-slate-200/80 p-6 md:p-8 min-h-[420px] flex items-center justify-center transition-all duration-300" id="feature-display">
+                        <div class="flex-1 flex items-center justify-center">
                             <div class="flex items-center justify-center p-2">
                                 <div class="relative bg-gradient-to-br from-slate-800 to-slate-900 rounded-2xl p-5 w-full max-w-md shadow-2xl border border-slate-700/50">
                                     <div class="flex items-center gap-2 mb-4">
@@ -581,18 +564,20 @@
                 
                 <div class="text-center md:text-right">
                     <h4 class="text-white font-bold mb-4 text-lg">Liên hệ Hỗ trợ Kỹ thuật & Phát triển</h4>
-                    <div class="flex flex-wrap items-center justify-center md:justify-end gap-x-1.5 text-sm text-slate-300">
-                        <span class="flex items-center gap-1.5 whitespace-nowrap">
+                    <div class="flex flex-nowrap items-center justify-center md:justify-end gap-x-1 text-xs sm:text-sm text-slate-300">
+                        <span class="flex items-center gap-1 whitespace-nowrap">
                             <span class="text-brandOrange">📞</span>
-                            <span class="font-medium text-white">0944.304.495</span> (Mr. Trí)
+                            <span class="font-medium text-white">0944.304.495</span>
+                            <span class="hidden sm:inline">(Mr. Trí)</span>
                         </span>
-                        <span class="text-slate-600 mx-1">•</span>
-                        <span class="flex items-center gap-1.5 whitespace-nowrap">
+                        <span class="text-slate-600">•</span>
+                        <span class="flex items-center gap-1 whitespace-nowrap">
                             <span class="text-brandOrange">📞</span>
-                            <span class="font-medium text-white">0399.344.780</span> (Mr. Nguyen)
+                            <span class="font-medium text-white">0399.344.780</span>
+                            <span class="hidden sm:inline">(Mr. Nguyen)</span>
                         </span>
-                        <span class="text-slate-600 mx-1">•</span>
-                        <span class="flex items-center gap-1.5 whitespace-nowrap">
+                        <span class="text-slate-600">•</span>
+                        <span class="flex items-center gap-1 whitespace-nowrap">
                             <span class="text-brandOrange">✉️</span>
                             <a href="mailto:admin.pockguardian@gmail.com" class="hover:text-brandOrange transition-colors">admin.pockguardian@gmail.com</a>
                         </span>
@@ -796,20 +781,7 @@
             
             setTimeout(() => {
                 displayObj.innerHTML = `
-                    <div class="flex-1 animate-fade-in-up">
-                        <div class="flex items-center justify-between mb-4 flex-wrap gap-2">
-                            <h3 class="text-2xl font-bold text-primary flex items-center">
-                                <span class="text-3xl mr-3">\${data.icon}</span> \${data.title}
-                            </h3>
-                            \${data.statusBadge}
-                        </div>
-                        <p class="text-slate-600 leading-relaxed text-base mb-6">\${data.desc}</p>
-                    </div>
-                    <div class="mt-auto border-t border-slate-200/60 pt-5">
-                        <div class="text-xs text-slate-400 uppercase font-bold tracking-wider mb-3 flex items-center justify-between">
-                            <span>Mô phỏng cơ chế vận hành hệ thống</span>
-                            <span class="font-mono text-[10px] bg-slate-200 text-slate-600 px-1.5 py-0.5 rounded">Live Preview</span>
-                        </div>
+                    <div class="flex-1 animate-fade-in-up flex items-center justify-center">
                         \${data.uiMockup}
                     </div>
                 `;
