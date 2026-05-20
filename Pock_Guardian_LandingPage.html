@@ -1,0 +1,838 @@
+<!DOCTYPE html>
+<html lang="vi" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pock Guardian - Giải pháp bảo vệ không gian số</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+        /* Strict Chart Container Styling */
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 300px;
+            max-height: 400px;
+        }
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 350px;
+            }
+        }
+        
+        /* Custom scrollbar for aesthetics */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #f1f5f9; }
+        ::-webkit-scrollbar-thumb { background: #3b82f6; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #1d4ed8; }
+
+        .feature-card.active {
+            border-color: #2563eb;
+            background-color: #eff6ff;
+            box-shadow: 0 4px 6px -1px rgba(37, 99, 235, 0.1), 0 2px 4px -1px rgba(37, 99, 235, 0.06);
+        }
+        
+        /* Toggle Switch Custom CSS */
+        .toggle-checkbox:checked {
+            right: 0;
+            border-color: #f97316;
+        }
+        .toggle-checkbox:checked + .toggle-label {
+            background-color: #f97316;
+        }
+        .toggle-checkbox {
+            right: 0;
+            z-index: 1;
+            border-color: #e2e8f0;
+            transition: all 0.3s;
+        }
+        .toggle-label {
+            width: 3.5rem;
+            height: 1.75rem;
+            background-color: #cbd5e1;
+            border-radius: 9999px;
+            transition: all 0.3s;
+        }
+        .toggle-dot {
+            top: 0.125rem;
+            left: 0.125rem;
+            width: 1.5rem;
+            height: 1.5rem;
+            transition: all 0.3s;
+        }
+        .toggle-checkbox:checked ~ .toggle-dot {
+            transform: translateX(1.75rem);
+        }
+
+        /* Animation for premium look */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        .animate-fade-in-up {
+            animation: fadeInUp 0.3s ease-out forwards;
+        }
+    </style>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#1e3a8a',    // Xanh dương đậm chính
+                        secondary: '#2563eb',  // Xanh dương hiện đại
+                        brandOrange: '#f97316',// Cam thương hiệu / CTA chính
+                        brandDark: '#3e2311',  // Màu nâu đậm đồng bộ font form
+                        dark: '#0f172a',       // Slate 900
+                        light: '#f8fafc',      // Slate 50
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-light text-slate-800 font-sans antialiased">
+
+    <nav class="fixed w-full z-50 bg-white/90 backdrop-blur-md border-b border-slate-200 shadow-sm transition-all duration-300" id="navbar">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16 items-center">
+                <div class="flex-shrink-0 flex items-center cursor-pointer" onclick="window.scrollTo(0,0)">
+                    <span class="text-2xl mr-2">🛡️</span>
+                    <span class="font-bold text-xl text-primary tracking-tight">POCK GUARDIAN</span>
+                </div>
+                <div class="hidden md:flex space-x-6 lg:space-x-8">
+                    <a href="#thuc-trang" class="text-slate-600 hover:text-secondary font-medium transition-colors">Thực trạng</a>
+                    <a href="#giai-phap" class="text-slate-600 hover:text-secondary font-medium transition-colors">Giải pháp</a>
+                    <a href="#quy-trinh" class="text-slate-600 hover:text-secondary font-medium transition-colors">Quy trình</a>
+                    <a href="#huong-dan" class="text-slate-600 hover:text-secondary font-medium transition-colors">Hướng dẫn</a>
+                    <a href="#bang-gia" class="text-slate-600 hover:text-secondary font-medium transition-colors">Bảng giá</a>
+                    <a href="#dang-ky" class="text-brandOrange hover:text-orange-600 font-bold transition-colors">Đăng ký dùng thử</a>
+                </div>
+                <div class="md:hidden flex items-center">
+                    <button id="mobile-menu-btn" class="text-slate-600 hover:text-primary focus:outline-none text-2xl">
+                        ☰
+                    </button>
+                </div>
+            </div>
+        </div>
+        <div id="mobile-menu" class="hidden md:hidden bg-white border-t border-slate-200">
+            <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3">
+                <a href="#thuc-trang" class="block px-3 py-2 text-slate-600 font-medium mobile-link">Thực trạng</a>
+                <a href="#giai-phap" class="block px-3 py-2 text-slate-600 font-medium mobile-link">Giải pháp</a>
+                <a href="#quy-trinh" class="block px-3 py-2 text-slate-600 font-medium mobile-link">Quy trình</a>
+                <a href="#huong-dan" class="block px-3 py-2 text-slate-600 font-medium mobile-link">Hướng dẫn</a>
+                <a href="#bang-gia" class="block px-3 py-2 text-slate-600 font-medium mobile-link">Bảng giá</a>
+                <a href="#dang-ky" class="block px-3 py-2 text-brandOrange font-bold mobile-link">Đăng ký dùng thử</a>
+            </div>
+        </div>
+    </nav>
+
+    <header class="pt-24 pb-16 md:pt-32 md:pb-24 bg-gradient-to-br from-blue-50 to-white overflow-hidden relative">
+        <div class="absolute top-0 right-0 -mr-20 -mt-20 w-96 h-96 rounded-full bg-blue-100 opacity-50 blur-3xl"></div>
+        <div class="absolute bottom-0 left-0 -ml-20 -mb-20 w-72 h-72 rounded-full bg-orange-50 opacity-50 blur-3xl"></div>
+        
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+            <div class="text-center max-w-4xl mx-auto">
+                <div class="inline-block p-4 rounded-full bg-blue-100 text-secondary mb-6 shadow-sm border border-blue-200 text-5xl">
+                    🛡️
+                </div>
+                <h1 class="text-4xl md:text-6xl font-extrabold text-dark mb-6 leading-tight">
+                    Giải pháp bảo vệ <span class="text-secondary">trẻ em</span> <br class="hidden md:block">trên không gian số
+                </h1>
+                <p class="text-lg md:text-xl text-slate-600 mb-8 max-w-2xl mx-auto">
+                    "Người gác cổng tận tụy" giúp cha mẹ bảo vệ con khỏi tác động tiêu cực, xây dựng thói quen khoa học và kết nối niềm tin. Không chỉ là phần mềm, đây là một dịch vụ an tâm.
+                </p>
+                
+                <div class="flex flex-col sm:flex-row justify-center items-center gap-4 mt-8">
+                    <a href="#dang-ky" class="w-full sm:w-auto px-8 py-3.5 bg-brandOrange text-white text-lg font-bold rounded-lg shadow-md hover:bg-orange-600 transition-all text-center flex items-center justify-center">
+                        Dùng thử Free
+                    </a>
+                    <a href="https://github.com/Nguyen36/POCKStorage/releases/download/v1.1/POCK_Guardian_Service.rar" class="w-full sm:w-auto px-8 py-3.5 bg-secondary text-white text-lg font-bold rounded-lg shadow-md hover:bg-blue-700 transition-all text-center flex items-center justify-center gap-2" download>
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+                        Download bộ cài
+                    </a>
+                    <a href="#bang-gia" class="w-full sm:w-auto px-8 py-3.5 bg-white text-slate-700 text-lg font-bold rounded-lg shadow-sm border-2 border-slate-200 hover:bg-slate-50 transition-all text-center flex items-center justify-center">
+                        Xem bảng giá chi tiết ↓
+                    </a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <section id="thuc-trang" class="py-16 md:py-24 bg-white">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center mb-12">
+                    <h2 class="text-3xl font-bold text-dark mb-4">🚨 Thực trạng đáng báo động</h2>
+                    <p class="text-slate-600 max-w-3xl mx-auto text-lg">
+                        Phần này trình bày bối cảnh rủi ro trên không gian mạng hiện nay. Qua biểu đồ trực quan, chúng ta thấy rõ tính cấp thiết của việc áp dụng các biện pháp bảo vệ trẻ em kịp thời.
+                    </p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+                    <div class="order-2 md:order-1">
+                        <div class="space-y-6">
+                            <div class="bg-red-50 border-l-4 border-red-500 p-4 rounded-r-lg">
+                                <h3 class="text-xl font-bold text-slate-800 flex items-center"><span class="mr-2 text-red-500">☢️</span> Môi trường số đầy rủi ro</h3>
+                                <p class="text-slate-600 mt-2">Máy tính là cửa sổ tri thức, nhưng cũng tiềm ẩn rủi ro khổng lồ. Trẻ dễ dàng tiếp cận web đen, bạo lực chỉ sau vài lần click chuột.</p>
+                            </div>
+                            <div class="bg-orange-50 border-l-4 border-brandOrange p-4 rounded-r-lg">
+                                <h3 class="text-xl font-bold text-slate-800 flex items-center"><span class="mr-2 text-brandOrange">🎮</span> Tình trạng nghiện Game/MXH</h3>
+                                <p class="text-slate-600 mt-2">Dẫn đến mất tập trung, ảnh hưởng trực tiếp đến thị lực, tâm lý và kết quả học tập của con trẻ.</p>
+                            </div>
+                            <div class="bg-slate-50 border-l-4 border-slate-500 p-4 rounded-r-lg">
+                                <h3 class="text-xl font-bold text-slate-800 flex items-center"><span class="mr-2 text-slate-600">👁️‍qiya</span> Lỗ hổng giám sát từ phụ huynh</h3>
+                                <p class="text-slate-600 mt-2">Cha mẹ bận rộn không thể kề cạnh 24/7. Thiếu kiến thức công nghệ khiến việc quản lý trở nên bất lực khi trẻ ngày càng tinh vi.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="order-1 md:order-2">
+                        <div class="chart-container">
+                            <canvas id="riskChart"></canvas>
+                        </div>
+                        <p class="text-center text-sm text-slate-500 mt-4 italic">* Thống kê tỷ lệ trẻ em tiếp cận nội dung độc hại trên internet khi không có giám sát.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="giai-phap" class="py-16 md:py-24 bg-gradient-to-b from-slate-50 to-white border-y border-slate-200">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center mb-12">
+                    <span class="text-brandOrange font-bold text-sm tracking-widest uppercase bg-orange-100 px-3 py-1 rounded-full">Tính năng cốt lõi</span>
+                    <h2 class="text-3xl md:text-4xl font-extrabold text-dark mt-3 mb-4">✨ Hệ Sinh Thái Công Nghệ Pock Guardian</h2>
+                    <p class="text-slate-600 max-w-3xl mx-auto text-lg">
+                        Khám phá trung tâm điều khiển thông minh. Hãy tương tác với các thẻ bên dưới để xem Pock Guardian bảo vệ không gian mạng của con một cách tinh tế và hiệu quả.
+                    </p>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
+                    <!-- Cột bên trái: Danh sách các Tab điều hướng -->
+                    <div class="lg:col-span-1 flex flex-col space-y-4" id="feature-tabs-container">
+                        <button class="feature-card active text-left p-5 rounded-xl border border-slate-200 bg-white transition-all duration-300 focus:outline-none hover:shadow-md transform hover:-translate-y-0.5" onclick="showFeature('monitor', this)">
+                            <h3 class="text-lg font-bold text-dark flex items-center"><span class="text-2xl mr-3">🖥️</span> Giám sát màn hình</h3>
+                            <p class="text-sm text-slate-500 mt-1 pl-9">Chụp ảnh màn hình ẩn định kỳ từ xa</p>
+                        </button>
+                        
+                        <button class="feature-card text-left p-5 rounded-xl border border-slate-200 bg-white transition-all duration-300 focus:outline-none hover:shadow-md transform hover:-translate-y-0.5" onclick="showFeature('control', this)">
+                            <h3 class="text-lg font-bold text-dark flex items-center"><span class="text-2xl mr-3">🔒</span> Khóa máy từ xa</h3>
+                            <p class="text-sm text-slate-500 mt-1 pl-9">Khóa/Mở máy tức thì qua điện thoại</p>
+                        </button>
+                        
+                        <button class="feature-card text-left p-5 rounded-xl border border-slate-200 bg-white transition-all duration-300 focus:outline-none hover:shadow-md transform hover:-translate-y-0.5" onclick="showFeature('hardware', this)">
+                            <h3 class="text-lg font-bold text-dark flex items-center"><span class="text-2xl mr-3">🛡️</span> USB Guardian</h3>
+                            <p class="text-sm text-slate-500 mt-1 pl-9">Chìa khóa bảo vệ, chống gỡ phần mềm</p>
+                        </button>
+
+                        <button class="feature-card text-left p-5 rounded-xl border border-slate-200 bg-white transition-all duration-300 focus:outline-none hover:shadow-md transform hover:-translate-y-0.5" onclick="showFeature('bot', this)">
+                            <h3 class="text-lg font-bold text-dark flex items-center"><span class="text-2xl mr-3">🤖</span> Trợ lý Bot Thông Minh</h3>
+                            <p class="text-sm text-slate-500 mt-1 pl-9">Điều khiển toàn diện qua tin nhắn</p>
+                        </button>
+                    </div>
+
+                    <!-- Cột bên phải: Khung hiển thị nội dung cao cấp (Đã điền sẵn trạng thái mặc định) -->
+                    <div class="lg:col-span-2 bg-gradient-to-br from-white to-slate-50/50 rounded-2xl shadow-xl border border-slate-200/80 p-6 md:p-8 min-h-[420px] flex flex-col justify-between transition-all duration-300" id="feature-display">
+                        <div class="flex-1">
+                            <div class="flex items-center justify-between mb-4">
+                                <h3 class="text-2xl font-bold text-primary flex items-center">
+                                    <span class="text-3xl mr-3">🖥️</span> Giám sát từ xa (Chụp màn hình ẩn)
+                                </h3>
+                                <span class="flex items-center gap-1.5 bg-emerald-100 text-emerald-700 text-xs font-bold px-2.5 py-1 rounded-full border border-emerald-200">
+                                    <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span> Hệ thống đang chạy ẩn
+                                </span>
+                            </div>
+                            <p class="text-slate-600 leading-relaxed text-base mb-6">
+                                Hệ thống tự động ghi lại hình ảnh màn hình máy tính theo định kỳ hoàn toàn ẩn danh. Phụ huynh dễ dàng xem lại dòng thời gian hoạt động trực tuyến để biết con đang tập trung học tập hay lướt web giải trí sai mục đích.
+                            </p>
+                        </div>
+                        <div class="mt-auto border-t border-slate-200/60 pt-5">
+                            <div class="text-xs text-slate-400 uppercase font-bold tracking-wider mb-3 flex items-center justify-between">
+                                <span>Mô phỏng cơ chế vận hành hệ thống</span>
+                                <span class="font-mono text-[10px] bg-slate-200 text-slate-600 px-1.5 py-0.5 rounded">v1.1-Live</span>
+                            </div>
+                            <div class="bg-slate-900 rounded-xl p-4 font-mono text-xs shadow-inner border border-slate-800 text-slate-300 space-y-2 overflow-x-auto">
+                                <div class="flex justify-between text-slate-500 border-b border-slate-800 pb-1.5 font-bold"><span>Thời gian (Log)</span><span>Hành động hệ thống (Action)</span><span>Trạng thái</span></div>
+                                <div class="flex justify-between items-center py-0.5 hover:bg-slate-800/50 px-1 rounded transition-colors"><span>14:05:22</span><span class="text-slate-100">[Capture] Zoom.exe - Đang học trực tuyến</span><span class="text-emerald-400 bg-emerald-500/10 px-1.5 py-0.2 rounded text-[10px]">An toàn</span></div>
+                                <div class="flex justify-between items-center py-0.5 hover:bg-slate-800/50 px-1 rounded transition-colors"><span>14:30:00</span><span class="text-slate-100">[Capture] Word.exe - Soạn bài thảo luận nhóm</span><span class="text-emerald-400 bg-emerald-500/10 px-1.5 py-0.2 rounded text-[10px]">An toàn</span></div>
+                                <div class="flex justify-between items-center py-0.5 bg-red-500/10 border border-red-500/20 px-1 rounded"><span>15:12:45</span><span class="text-red-400 font-semibold">[Cảnh báo] Chrome.exe - Truy cập Game lậu / Web chặn</span><span class="text-red-400 bg-red-500/20 px-1.5 py-0.2 rounded text-[10px] font-bold animate-pulse">Nguy hiểm</span></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="quy-trinh" class="py-16 md:py-24 bg-white">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center mb-16">
+                    <h2 class="text-3xl font-bold text-dark mb-4">⚙️ Quy trình "Chìa khóa trao tay"</h2>
+                    <p class="text-slate-600 max-w-3xl mx-auto text-lg">
+                        Quy trình triển khai được thiết kế tối giản nhất để xóa bỏ rào cản công nghệ cho phụ huynh. Chỉ với 3 bước, hệ thống bảo vệ sẽ được kích hoạt toàn diện.
+                    </p>
+                </div>
+
+                <div class="relative max-w-4xl mx-auto">
+                    <div class="hidden md:block absolute left-1/2 transform -translate-x-1/2 h-full w-1 bg-blue-100"></div>
+
+                    <div class="relative flex items-center justify-between md:justify-normal w-full mb-12">
+                        <div class="md:w-1/2 flex justify-end md:pr-12 w-full order-2 md:order-1 pl-12 md:pl-0">
+                            <div class="bg-white p-6 rounded-xl shadow-md border border-slate-100 w-full text-left md:text-right hover:shadow-lg transition-shadow">
+                                <h3 class="text-xl font-bold text-secondary mb-2">1. Cài đặt vật lý</h3>
+                                <p class="text-slate-600">Cắm USB Guardian vào máy tính của con. Chuyên viên kỹ thuật hỗ trợ cấu hình từ xa hoặc trực tiếp tận nhà.</p>
+                            </div>
+                        </div>
+                        <div class="absolute left-0 md:left-1/2 transform md:-translate-x-1/2 w-10 h-10 rounded-full bg-primary text-white flex items-center justify-center font-bold text-xl border-4 border-white shadow-sm z-10">1</div>
+                        <div class="md:w-1/2 order-1 md:order-2"></div>
+                    </div>
+
+                    <div class="relative flex items-center justify-between md:justify-normal w-full mb-12">
+                        <div class="md:w-1/2 order-1 md:order-1"></div>
+                        <div class="absolute left-0 md:left-1/2 transform md:-translate-x-1/2 w-10 h-10 rounded-full bg-secondary text-white flex items-center justify-center font-bold text-xl border-4 border-white shadow-sm z-10">2</div>
+                        <div class="md:w-1/2 flex justify-start md:pl-12 w-full order-2 md:order-2 pl-12 md:pl-0">
+                            <div class="bg-white p-6 rounded-xl shadow-md border border-slate-100 w-full text-left hover:shadow-lg transition-shadow">
+                                <h3 class="text-xl font-bold text-secondary mb-2">2. Kết nối di động</h3>
+                                <p class="text-slate-600">Cha mẹ quét mã QR trên ứng dụng điện thoại để đồng bộ hóa. Toàn bộ kết nối được mã hóa bảo mật tuyệt đối.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="relative flex items-center justify-between md:justify-normal w-full">
+                        <div class="md:w-1/2 flex justify-end md:pr-12 w-full order-2 md:order-1 pl-12 md:pl-0">
+                            <div class="bg-white p-6 rounded-xl shadow-md border border-slate-100 w-full text-left md:text-right hover:shadow-lg transition-shadow">
+                                <h3 class="text-xl font-bold text-emerald-500 mb-2">3. Nhận báo cáo tự động</h3>
+                                <p class="text-slate-600">Hệ thống bắt đầu hoạt động vô hình, gửi báo cáo hàng ngày và cảnh báo thời gian thực qua Telegram/Zalo.</p>
+                            </div>
+                        </div>
+                        <div class="absolute left-0 md:left-1/2 transform md:-translate-x-1/2 w-10 h-10 rounded-full bg-emerald-500 text-white flex items-center justify-center font-bold text-xl border-4 border-white shadow-sm z-10">3</div>
+                        <div class="md:w-1/2 order-1 md:order-2"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="huong-dan" class="py-16 md:py-24 bg-slate-50 border-t border-slate-200">
+            <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center mb-10">
+                    <h2 class="text-3xl font-bold text-dark mb-4">🎥 Hướng dẫn cài đặt chi tiết</h2>
+                    <p class="text-slate-600 text-lg">
+                        Hãy xem video bên dưới để biết cách tải, cài đặt và cấu hình Pock Guardian một cách dễ dàng và nhanh chóng nhất.
+                    </p>
+                </div>
+                
+                <div class="relative w-full overflow-hidden rounded-2xl shadow-xl border border-slate-200 bg-slate-200" style="padding-top: 56.25%;">
+                    <div class="absolute inset-0 flex flex-col items-center justify-center text-slate-500 border-2 border-dashed border-slate-300">
+                        <span class="text-5xl mb-3">▶️</span>
+                        <p class="font-medium text-lg">Khu vực chèn Video hướng dẫn cài đặt</p>
+                        <p class="text-sm mt-1">Chèn mã nhúng (iframe) từ Youtube vào vị trí này</p>
+                    </div>
+                    </div>
+            </div>
+        </section>
+
+        <section id="bang-gia" class="py-16 md:py-24 bg-gradient-to-b from-slate-900 to-primary text-white border-t border-slate-800">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                
+                <div class="text-center mb-6">
+                    <h2 class="text-3xl md:text-4xl font-bold mb-4">💰 Bảng giá POCK GUARDIAN</h2>
+                    <p class="text-slate-300 max-w-2xl mx-auto text-base">
+                        🎁 Đăng ký dùng thử <span class="text-brandOrange font-bold">Miễn phí 7 ngày</span> trải nghiệm đầy đủ tính năng Premium!
+                    </p>
+                </div>
+
+                <div class="flex justify-center items-center mb-16">
+                    <span class="text-base font-medium mr-3" id="label-thang">Thanh toán theo tháng</span>
+                    <div class="relative inline-block w-14 align-middle select-none transition duration-200 ease-in">
+                        <input type="checkbox" name="toggle" id="pricing-toggle" class="toggle-checkbox absolute block w-6 h-6 rounded-full bg-white border-4 appearance-none cursor-pointer" checked/>
+                        <label for="pricing-toggle" class="toggle-label block overflow-hidden h-6 rounded-full bg-slate-700 cursor-pointer"></label>
+                        <div class="toggle-dot absolute w-5 h-5 bg-white rounded-full pointer-events-none"></div>
+                    </div>
+                    <span class="text-base font-bold ml-3 text-brandOrange flex items-center" id="label-nam">
+                        Thanh toán theo năm <span class="ml-1.5 text-xs bg-brandOrange/20 text-brandOrange px-2 py-0.5 rounded-full border border-brandOrange/30">Tiết kiệm tốt nhất</span>
+                    </span>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 max-w-6xl mx-auto mb-16 items-stretch">
+                    
+                    <div class="bg-slate-800/80 backdrop-blur-sm rounded-2xl p-8 border border-slate-700 flex flex-col justify-between transition-transform hover:-translate-y-1">
+                        <div>
+                            <h3 class="text-xl font-bold text-slate-200 mb-2 flex items-center">🟢 Gói BASIC</h3>
+                            <p class="text-sm text-slate-400 mb-6">Phù hợp phụ huynh cần giám sát máy tính cơ bản.</p>
+                            <div class="mb-6">
+                                <span class="text-4xl font-extrabold text-white" id="price-basic">890.000đ</span>
+                                <span class="text-slate-400 text-sm" id="period-basic">/ năm</span>
+                            </div>
+                            <ul class="space-y-3.5 border-t border-slate-700/60 pt-6">
+                                <li class="flex items-start text-sm text-slate-300"><span class="text-brandOrange mr-2.5">🖥️</span> Chụp màn hình từ xa</li>
+                                <li class="flex items-start text-sm text-slate-300"><span class="text-brandOrange mr-2.5">📝</span> Xem ứng dụng đang mở</li>
+                                <li class="flex items-start text-sm text-slate-300"><span class="text-brandOrange mr-2.5">📊</span> Báo cáo hoạt động</li>
+                                <li class="flex items-start text-sm text-slate-300"><span class="text-brandOrange mr-2.5">🚨</span> Cảnh báo tự động</li>
+                            </ul>
+                        </div>
+                        <div class="pt-8">
+                            <a href="#dang-ky" class="block w-full py-3 px-4 bg-slate-700 hover:bg-slate-600 text-center text-white font-bold rounded-xl text-sm transition-colors">Đăng ký Basic</a>
+                        </div>
+                    </div>
+
+                    <div class="bg-gradient-to-b from-blue-900 to-slate-900 rounded-2xl p-8 border-2 border-brandOrange relative flex flex-col justify-between transform lg:-translate-y-3 shadow-2xl shadow-orange-500/10">
+                        <div class="absolute -top-3.5 left-1/2 transform -translate-x-1/2 bg-brandOrange text-white text-xs font-bold px-4 py-1 rounded-full shadow-md whitespace-nowrap tracking-wide uppercase">
+                            🔥 Được phụ huynh lựa chọn nhiều nhất
+                        </div>
+                        <div>
+                            <h3 class="text-xl font-bold text-white mb-2 mt-2 flex items-center">🔵 Gói PRO</h3>
+                            <p class="text-sm text-blue-200 mb-6">Quản lý chặt chẽ & bảo vệ toàn diện thiết bị của con.</p>
+                            <div class="mb-6">
+                                <span class="text-4xl font-extrabold text-white" id="price-pro">1.290.000đ</span>
+                                <span class="text-blue-300 text-sm" id="period-pro">/ năm</span>
+                            </div>
+                            <ul class="space-y-3.5 border-t border-blue-800 pt-6">
+                                <li class="flex items-start text-sm text-white font-medium"><span class="text-brandOrange mr-2.5">✅</span> Bao gồm toàn bộ gói BASIC</li>
+                                <li class="flex items-start text-sm text-slate-200"><span class="text-brandOrange mr-2.5">📸</span> Camera webcam giám sát</li>
+                                <li class="flex items-start text-sm text-slate-200"><span class="text-brandOrange mr-2.5">🔒</span> Khóa / mở máy từ xa tức thì</li>
+                                <li class="flex items-start text-sm text-slate-200"><span class="text-brandOrange mr-2.5">📱</span> Quản lý đồng bộ qua điện thoại</li>
+                                <li class="flex items-start text-sm text-slate-200"><span class="text-brandOrange mr-2.5">🛡️</span> USB Guardian bảo vệ phần cứng</li>
+                            </ul>
+                        </div>
+                        <div class="pt-8">
+                            <div class="text-center text-xs text-brandOrange font-bold mb-2 uppercase tracking-wide" id="pro-badge-notice">Combo tốt nhất - Miễn phí setup 399k</div>
+                            <a href="#dang-ky" class="block w-full py-3.5 px-4 bg-brandOrange hover:bg-orange-600 text-center text-white font-bold rounded-xl text-sm shadow-lg shadow-orange-500/20 transition-all">Đăng ký gói PRO ngay</a>
+                        </div>
+                    </div>
+
+                    <div class="bg-slate-800/80 backdrop-blur-sm rounded-2xl p-8 border border-slate-700 flex flex-col justify-between transition-transform hover:-translate-y-1">
+                        <div>
+                            <h3 class="text-xl font-bold text-slate-200 mb-2 flex items-center">🔴 Gói FAMILY</h3>
+                            <p class="text-sm text-slate-400 mb-6">Gia đình có nhiều con hoặc dùng nhiều máy tính.</p>
+                            <div class="mb-6">
+                                <span class="text-4xl font-extrabold text-white" id="price-family">2.090.000đ</span>
+                                <span class="text-slate-400 text-sm" id="period-family">/ năm</span>
+                            </div>
+                            <ul class="space-y-3.5 border-t border-slate-700/60 pt-6">
+                                <li class="flex items-start text-sm text-white font-medium"><span class="text-brandOrange mr-2.5">✅</span> Bao gồm toàn bộ gói PRO</li>
+                                <li class="flex items-start text-sm text-slate-300"><span class="text-brandOrange mr-2.5">👨‍👩‍👧</span> Hỗ trợ cùng lúc 3 thiết bị</li>
+                                <li class="flex items-start text-sm text-slate-300"><span class="text-brandOrange mr-2.5">☁️</span> Tự động Backup bảo vệ dữ liệu</li>
+                                <li class="flex items-start text-sm text-slate-300"><span class="text-brandOrange mr-2.5">📂</span> Đồng bộ lịch sử hoạt động đa máy</li>
+                                <li class="flex items-start text-sm text-slate-300"><span class="text-brandOrange mr-2.5">🔔</span> Kênh cảnh báo khẩn cấp ưu tiên</li>
+                            </ul>
+                        </div>
+                        <div class="pt-8">
+                            <a href="#dang-ky" class="block w-full py-3 px-4 bg-slate-700 hover:bg-slate-600 text-center text-white font-bold rounded-xl text-sm transition-colors">Đăng ký Family</a>
+                        </div>
+                    </div>
+
+                </div>
+
+                <div class="max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-6 border-t border-slate-800 pt-10 text-slate-300 text-sm">
+                    <div class="bg-slate-800/40 p-5 rounded-xl border border-slate-800 flex items-start space-x-3">
+                        <span class="text-2xl mt-0.5">🔰</span>
+                        <div>
+                            <h4 class="font-bold text-white text-base mb-1">Phí cấu hình ban đầu</h4>
+                            <p class="text-slate-300 mb-1"><span class="font-bold text-brandOrange" id="setup-cost-text">399.000đ</span> / thiết bị (Thanh toán 1 lần duy nhất)</p>
+                            <p class="text-xs text-slate-400 leading-relaxed">Bao gồm: Thiết bị USB vật lý, kích hoạt mã license khóa hệ thống, kết nối cấu hình cảnh báo về Telegram/Zalo cá nhân và setup ban đầu.</p>
+                            <p class="text-xs text-emerald-400 font-semibold mt-1.5" id="setup-free-badge">✓ Đang được miễn phí 100% khi chọn mua Gói Năm!</p>
+                        </div>
+                    </div>
+
+                    <div class="bg-slate-800/40 p-5 rounded-xl border border-slate-800 flex items-start space-x-3">
+                        <span class="text-2xl mt-0.5">🛠️</span>
+                        <div>
+                            <h4 class="font-bold text-white text-base mb-1">Premium Care (Tuỳ chọn nâng cao)</h4>
+                            <p class="text-slate-300 mb-1"><span class="font-bold text-white">+299.000đ</span> / năm</p>
+                            <p class="text-xs text-slate-400 leading-relaxed">Bao gồm: Hỗ trợ cài đặt lại hoàn toàn miễn phí khi đổi máy tính mới (1 lần/năm), xử lý nhanh mọi xung đột hệ điều hành lỗi và ưu tiên hỗ trợ từ đội ngũ kỹ thuật riêng biệt.</p>
+                        </div>
+                    </div>
+                </div>             
+
+            </div>
+        </section>
+        
+        <section class="py-12 bg-blue-50 border-t border-blue-100">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+                <h2 class="text-2xl font-bold text-primary mb-8">Cam kết "An tâm tuyệt đối" từ Pock Guardian</h2>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="bg-white p-6 rounded-lg shadow-sm border border-slate-100">
+                        <div class="text-4xl mb-4">🔒</div>
+                        <h4 class="font-bold text-dark mb-2">Bảo mật dữ liệu 100%</h4>
+                        <p class="text-sm text-slate-600">Dữ liệu mã hóa đầu cuối. Chỉ duy nhất thiết bị của phụ huynh mới có quyền giải mã và xem hình ảnh.</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-lg shadow-sm border border-slate-100">
+                        <div class="text-4xl mb-4">💳</div>
+                        <h4 class="font-bold text-dark mb-2">Dùng thử 7 ngày</h4>
+                        <p class="text-sm text-slate-600">Hoàn tiền 100% không cần lý do nếu giải pháp không đáp ứng được kỳ vọng quản lý của gia đình.</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-lg shadow-sm border border-slate-100">
+                        <div class="text-4xl mb-4">🔄</div>
+                        <h4 class="font-bold text-dark mb-2">Bảo hành 1 đổi 1</h4>
+                        <p class="text-sm text-slate-600">Bảo hành thiết bị Guardian USB 12 tháng. Đội ngũ support sẵn sàng hỗ trợ trực tuyến 8h-22h mỗi ngày.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="dang-ky" class="py-16 md:py-24 bg-white">
+            <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flex flex-col md:flex-row rounded-2xl overflow-hidden shadow-2xl border border-slate-100">
+                    
+                    <div class="w-full md:w-3/5 p-8 md:p-12 bg-[#f08840] text-[#3e2311]">
+                        <h2 class="text-3xl md:text-4xl font-extrabold mb-4 text-[#3e2311]">Đăng ký dùng thử miễn phí!</h2>
+                        <p class="mb-8 font-medium leading-relaxed opacity-90">
+                            Mời bạn để lại thông tin liên hệ, chuyên viên Pock Guardian sẽ nhanh chóng gửi tặng tài khoản cấp quyền dùng thử miễn phí 7 ngày và hỗ trợ bạn thiết lập từ xa lập tức.
+                        </p>
+                        
+                        <form action="https://api.web3forms.com/submit" method="POST">
+                            <input type="hidden" name="access_key" value="eb00ab44-10d3-4680-a9f2-78c833612539">
+                            
+                            <input type="hidden" name="subject" value="Đăng ký dùng thử Pock Guardian">
+                            <input type="hidden" name="from_name" value="Pock Guardian Website">
+                            <input type="hidden" name="success_message" value="Đăng ký thành công! Chuyên viên sẽ liên hệ với bạn qua Zalo/Email sớm nhất.">
+                            
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                                <div>
+                                    <label class="block text-sm font-semibold mb-1 text-[#3e2311]">Họ và tên phụ huynh</label>
+                                    <input type="text" name="name" required class="w-full px-4 py-3 rounded bg-orange-50 border-none focus:ring-2 focus:ring-[#3e2311] outline-none text-slate-800" placeholder="Ví dụ: Nguyễn Văn A">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-semibold mb-1 text-[#3e2311]">Địa chỉ Email</label>
+                                    <input type="email" name="email" required class="w-full px-4 py-3 rounded bg-orange-50 border-none focus:ring-2 focus:ring-[#3e2311] outline-none text-slate-800" placeholder="parent@email.com">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-semibold mb-1 text-[#3e2311]">Số điện thoại (Zalo)</label>
+                                    <input type="tel" name="phone" required class="w-full px-4 py-3 rounded bg-orange-50 border-none focus:ring-2 focus:ring-[#3e2311] outline-none text-slate-800" placeholder="0901234567">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-semibold mb-1 text-[#3e2311]">Khu vực đang sinh sống</label>
+                                    <select name="location" required class="w-full px-4 py-3 rounded bg-orange-50 border-none focus:ring-2 focus:ring-[#3e2311] outline-none text-slate-800">
+                                        <option value="">Chọn Tỉnh/Thành phố:</option>
+                                        <option value="hcm">TP. Hồ Chí Minh</option>
+                                        <option value="hn">Hà Nội</option>
+                                        <option value="dn">Đà Nẵng</option>
+                                        <option value="other">Tỉnh thành khác</option>
+                                    </select>
+                                </div>
+                            </div>
+                            
+                            <div class="pt-4">
+                                <button type="submit" class="w-full sm:w-1/2 px-6 py-3.5 bg-[#3e2311] hover:bg-[#2c180b] text-white font-bold text-lg rounded shadow-lg transition-colors">
+                                    Gửi đăng ký ngay
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+
+                    <div class="hidden md:block md:w-2/5 relative min-h-[400px]">
+                        <img src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Đăng ký trải nghiệm" class="absolute inset-0 w-full h-full object-cover">
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="bg-dark text-slate-400 py-12 border-t border-slate-800">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8 border-b border-slate-800 pb-8">
+                <div class="text-center md:text-left">
+                    <div class="flex items-center justify-center md:justify-start mb-4">
+                        <span class="text-2xl mr-2">🛡️</span>
+                        <span class="font-bold text-xl text-white tracking-tight">POCK GUARDIAN</span>
+                    </div>
+                    <p class="text-sm tracking-wide text-slate-400">VÌ MỘT THẾ HỆ SỐ KHỎE MẠNH VÀ AN TOÀN TUYỆT ĐỐI</p>
+                </div>
+                
+                <div class="text-center md:text-right">
+                    <h4 class="text-white font-bold mb-4 text-lg">Liên hệ Hỗ trợ Kỹ thuật & Phát triển</h4>
+                    <div class="space-y-3 text-sm text-slate-300 flex flex-col items-center md:items-end">
+                        <p class="flex items-center gap-2">
+                            <span class="text-brandOrange">📞</span> 
+                            <span class="font-medium text-white">0944.304.495</span> (Mr. Trí)
+                        </p>
+                        <p class="flex items-center gap-2">
+                            <span class="text-brandOrange">📞</span> 
+                            <span class="font-medium text-white">0399.344.780</span> (Mr. Nguyen)
+                        </p>
+                        <p class="flex items-center gap-2">
+                            <span class="text-brandOrange">✉️</span> 
+                            <a href="mailto:admin.pockguardian@gmail.com" class="hover:text-brandOrange transition-colors">admin.pockguardian@gmail.com</a>
+                        </p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="text-center text-sm text-slate-500">
+                <p>© 2026 Pock Guardian. Tất cả các quyền được bảo lưu.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // --- 1. State Management & Data Storage ---
+        const appState = {
+            isYearly: true, // Default to yearly calculation as recommended
+            activeFeature: 'monitor'
+        };
+
+        const featureData = {
+            monitor: {
+                title: "Giám sát từ xa (Chụp màn hình ẩn)",
+                icon: "🖥️",
+                statusBadge: `<span class="flex items-center gap-1.5 bg-emerald-100 text-emerald-700 text-xs font-bold px-2.5 py-1 rounded-full border border-emerald-200"><span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span> Hệ thống đang chạy ẩn</span>`,
+                desc: "Hệ thống tự động ghi lại hình ảnh màn hình máy tính theo định kỳ hoàn toàn ẩn danh. Phụ huynh dễ dàng xem lại dòng thời gian hoạt động trực tuyến để biết con đang tập trung học tập hay lướt web giải trí sai mục đích.",
+                uiMockup: `<div class="bg-slate-900 rounded-xl p-4 font-mono text-xs shadow-inner border border-slate-800 text-slate-300 space-y-2 overflow-x-auto">
+                    <div class="flex justify-between text-slate-500 border-b border-slate-800 pb-1.5 font-bold"><span>Thời gian (Log)</span><span>Hành động hệ thống (Action)</span><span>Trạng thái</span></div>
+                    <div class="flex justify-between items-center py-0.5 hover:bg-slate-800/50 px-1 rounded transition-colors"><span>14:05:22</span><span class="text-slate-100">[Capture] Zoom.exe - Đang học trực tuyến</span><span class="text-emerald-400 bg-emerald-500/10 px-1.5 py-0.2 rounded text-[10px]">An toàn</span></div>
+                    <div class="flex justify-between items-center py-0.5 hover:bg-slate-800/50 px-1 rounded transition-colors"><span>14:30:00</span><span class="text-slate-100">[Capture] Word.exe - Soạn bài thảo luận nhóm</span><span class="text-emerald-400 bg-emerald-500/10 px-1.5 py-0.2 rounded text-[10px]">An toàn</span></div>
+                    <div class="flex justify-between items-center py-0.5 bg-red-500/10 border border-red-500/20 px-1 rounded"><span>15:12:45</span><span class="text-red-400 font-semibold">[Cảnh báo] Chrome.exe - Truy cập Game lậu / Web chặn</span><span class="text-red-400 bg-red-500/20 px-1.5 py-0.2 rounded text-[10px] font-bold animate-pulse">Nguy hiểm</span></div>
+                </div>`
+            },
+            control: {
+                title: "Khóa / Mở máy tức thì qua điện thoại",
+                icon: "🔒",
+                statusBadge: `<span class="flex items-center gap-1.5 bg-blue-100 text-blue-700 text-xs font-bold px-2.5 py-1 rounded-full border border-blue-200"><span class="w-2 h-2 rounded-full bg-blue-500 animate-pulse"></span> Thời gian thực &lt; 1s</span>`,
+                desc: "Không cần phải tranh cãi hay tịch thu máy tính, cha mẹ có thể quản lý trực tiếp bằng app điện thoại để khóa màn hình máy tính của con từ xa ngay lập tức bằng một chạm khi đã đến giờ ăn cơm, làm việc nhà hoặc đi ngủ.",
+                uiMockup: `<div class="bg-gradient-to-b from-slate-800 to-slate-900 rounded-2xl p-5 w-60 mx-auto text-white shadow-xl relative overflow-hidden border-4 border-slate-700">
+                    <div class="absolute top-2 right-1/2 transform translate-x-1/2 w-14 h-1 bg-slate-600 rounded-full"></div>
+                    <div class="text-center mt-2 mb-4 text-xs tracking-wide text-slate-400 uppercase font-semibold">Bảng điều khiển mẹ</div>
+                    <div class="bg-slate-800/80 rounded-lg p-3 text-center mb-4 border border-slate-700/50">
+                        <span class="text-[11px] text-slate-400 block mb-0.5">Thiết bị PC của Con</span>
+                        <span class="text-xs font-bold text-green-400 flex items-center justify-center gap-1"><span class="w-1.5 h-1.5 rounded-full bg-green-400 animate-ping"></span> ĐANG KẾT NỐI</span>
+                    </div>
+                    <button class="w-full bg-red-500 hover:bg-red-600 active:scale-95 text-white font-bold py-3 rounded-xl shadow-lg shadow-red-500/20 flex items-center justify-center gap-2 transition-all text-xs">
+                        <span>🔒</span> KHÓA MÁY CON TỨC THÌ
+                    </button>
+                    <div class="mt-3 text-[10px] text-slate-500 text-center italic">Giao diện ứng dụng di động độc quyền</div>
+                </div>`
+            },
+            hardware: {
+                title: "Chìa khóa phần cứng USB Guardian chống gỡ ứng dụng",
+                icon: "🛡️",
+                statusBadge: `<span class="flex items-center gap-1.5 bg-amber-100 text-amber-700 text-xs font-bold px-2.5 py-1 rounded-full border border-amber-200"><span class="w-2 h-2 rounded-full bg-amber-500"></span> Bảo vệ lớp cứng</span>`,
+                desc: "Khác biệt lớn nhất với các phần mềm thông thường là con không thể tự mò cách gỡ bỏ. USB Guardian đóng vai trò như một ổ khóa vật lý cắm trực tiếp. Hệ thống phát báo động ngay về điện thoại mẹ nếu bị rút và chặn đứng mọi hành vi can thiệp phần mềm bảo vệ.",
+                uiMockup: `<div class="flex flex-col items-center justify-center p-4">
+                    <div class="relative flex items-center justify-center bg-white border border-slate-200 p-4 rounded-xl shadow-sm max-w-sm w-full gap-4">
+                        <div class="w-12 h-12 bg-blue-50 text-blue-600 text-2xl flex items-center justify-center rounded-lg border border-blue-100 shadow-inner">🔌</div>
+                        <div class="flex-1 text-left">
+                            <h4 class="font-bold text-slate-800 text-xs">Trạng thái USB vật lý</h4>
+                            <p class="text-[11px] text-emerald-600 font-medium mt-0.5">✓ Đang gắn - Phần cứng bảo vệ an toàn</p>
+                        </div>
+                        <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 shadow shadow-emerald-400 animate-pulse"></span>
+                    </div>
+                    <p class="text-[11px] text-slate-400 mt-3 text-center">Mạch mã hóa chống sao chép độc quyền Pock Guardian</p>
+                </div>`
+            },
+            bot: {
+                title: "Trợ lý Bot thông minh (Điều khiển qua tin nhắn)",
+                icon: "🤖",
+                statusBadge: `<span class="flex items-center gap-1.5 bg-purple-100 text-purple-700 text-xs font-bold px-2.5 py-1 rounded-full border border-purple-200"><span class="w-2 h-2 rounded-full bg-purple-500 animate-pulse"></span> Hỗ trợ Zalo/Telegram</span>`,
+                desc: "Không cần mở ứng dụng phức tạp, phụ huynh chỉ cần trò chuyện với Trợ lý Bot trên Zalo/Telegram. Nhắn tin ra lệnh ngắn gọn như '/lock' để khóa máy, hoặc '/screen' để nhận ngay ảnh chụp màn hình máy tính con gửi về trong 1 giây.",
+                uiMockup: `<div class="max-w-sm mx-auto bg-white border border-slate-200 rounded-xl overflow-hidden shadow-md font-sans text-xs w-full">
+                    <div class="bg-primary p-2.5 text-white flex items-center gap-2 font-bold">
+                        <span class="bg-white/20 w-7 h-7 rounded-full flex items-center justify-center text-sm">🤖</span>
+                        <div>
+                            <p class="text-[11px]">Pock Guardian Assistant</p>
+                            <p class="text-[9px] text-blue-200 font-normal">Trợ lý bảo vệ tự động</p>
+                        </div>
+                    </div>
+                    <div class="p-3 bg-slate-50 space-y-2.5 h-44 overflow-y-auto flex flex-col">
+                        <div class="bg-blue-500 text-white p-2 rounded-lg rounded-tr-none max-w-[75%] self-end shadow-sm">/screen</div>
+                        <div class="bg-white text-slate-800 p-2 rounded-lg rounded-tl-none max-w-[80%] self-start border border-slate-100 shadow-sm flex flex-col gap-1.5">
+                            <p>📸 Ảnh chụp màn hình máy tính con lúc <span class="font-bold">15:32</span>:</p>
+                            <div class="w-full h-16 bg-slate-200 rounded border border-dashed border-slate-300 flex items-center justify-center text-[10px] text-slate-400 font-mono">[Hình ảnh màn hình con]</div>
+                        </div>
+                    </div>
+                </div>`
+            }
+        };
+
+        // --- 2. Interactive Logic & Event Handling ---
+
+        // Mobile Menu Toggle
+        document.getElementById('mobile-menu-btn').addEventListener('click', () => {
+            const menu = document.getElementById('mobile-menu');
+            menu.classList.toggle('hidden');
+        });
+
+        // Close mobile menu on link click
+        document.querySelectorAll('.mobile-link').forEach(link => {
+            link.addEventListener('click', () => {
+                document.getElementById('mobile-menu').classList.add('hidden');
+            });
+        });
+
+        // Feature Tab Logic
+        window.showFeature = function(key, element) {
+            document.querySelectorAll('.feature-card').forEach(card => {
+                card.classList.remove('active', 'border-blue-600', 'bg-blue-50');
+            });
+            
+            if (element) {
+                element.classList.add('active');
+            } else {
+                const targetBtn = document.querySelector(`button[onclick*="'\${key}'"]`);
+                if (targetBtn) targetBtn.classList.add('active');
+            }
+
+            const data = featureData[key];
+            const displayObj = document.getElementById('feature-display');
+            
+            displayObj.style.opacity = '0';
+            displayObj.style.transform = 'translateY(5px)';
+            
+            setTimeout(() => {
+                displayObj.innerHTML = `
+                    <div class="flex-1 animate-fade-in-up">
+                        <div class="flex items-center justify-between mb-4 flex-wrap gap-2">
+                            <h3 class="text-2xl font-bold text-primary flex items-center">
+                                <span class="text-3xl mr-3">\${data.icon}</span> \${data.title}
+                            </h3>
+                            \${data.statusBadge}
+                        </div>
+                        <p class="text-slate-600 leading-relaxed text-base mb-6">\${data.desc}</p>
+                    </div>
+                    <div class="mt-auto border-t border-slate-200/60 pt-5">
+                        <div class="text-xs text-slate-400 uppercase font-bold tracking-wider mb-3 flex items-center justify-between">
+                            <span>Mô phỏng cơ chế vận hành hệ thống</span>
+                            <span class="font-mono text-[10px] bg-slate-200 text-slate-600 px-1.5 py-0.5 rounded">Live Preview</span>
+                        </div>
+                        \${data.uiMockup}
+                    </div>
+                `;
+                displayObj.style.transition = 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)';
+                displayObj.style.opacity = '1';
+                displayObj.style.transform = 'translateY(0)';
+            }, 150);
+        };
+
+        // Initialize first feature
+        // Gọi thẳng monitor để đồng bộ UI ban đầu
+        // Chờ DOM load xong hoặc chạy luôn vì script đặt cuối body
+        setTimeout(() => {
+            const firstBtn = document.querySelector(`button[onclick*="'monitor'"]`);
+            showFeature('monitor', firstBtn);
+        }, 50);
+
+        // Pricing Toggle Logic
+        const toggleBtn = document.getElementById('pricing-toggle');
+        const labelThang = document.getElementById('label-thang');
+        const labelNam = document.getElementById('label-nam');
+        
+        toggleBtn.addEventListener('change', (e) => {
+            appState.isYearly = e.target.checked;
+            updatePricingUI();
+        });
+
+        function updatePricingUI() {
+            if (appState.isYearly) {
+                labelNam.classList.add('text-brandOrange', 'font-bold');
+                labelNam.classList.remove('text-slate-300');
+                labelThang.classList.remove('text-white', 'font-bold');
+                labelThang.classList.add('text-slate-300');
+
+                // Update text prices
+                document.getElementById('price-basic').innerText = "890.000đ";
+                document.getElementById('period-basic').innerText = "/ năm";
+                document.getElementById('price-pro').innerText = "1.290.000đ";
+                document.getElementById('period-pro').innerText = "/ năm";
+                document.getElementById('price-family').innerText = "2.090.000đ";
+                document.getElementById('period-family').innerText = "/ năm";
+
+                // Setup Notices & Badges
+                document.getElementById('pro-badge-notice').innerText = "Combo tốt nhất - Miễn phí setup 399k";
+                document.getElementById('setup-cost-text').innerHTML = "<span class='line-through text-slate-500 mr-1.5'>399.000đ</span> 0đ";
+                document.getElementById('setup-free-badge').classList.remove('hidden');
+            } else {
+                labelThang.classList.add('text-white', 'font-bold');
+                labelThang.classList.remove('text-slate-300');
+                labelNam.classList.remove('text-brandOrange', 'font-bold');
+                labelNam.classList.add('text-slate-300');
+
+                // Update text prices
+                document.getElementById('price-basic').innerText = "99.000đ";
+                document.getElementById('period-basic').innerText = "/ tháng";
+                document.getElementById('price-pro').innerText = "149.000đ";
+                document.getElementById('period-pro').innerText = "/ tháng";
+                document.getElementById('price-family').innerText = "249.000đ";
+                document.getElementById('period-family').innerText = "/ tháng";
+
+                // Setup Notices & Badges
+                document.getElementById('pro-badge-notice').innerText = "Bảo vệ toàn diện hàng tháng";
+                document.getElementById('setup-cost-text').innerHTML = "399.000đ";
+                document.getElementById('setup-free-badge').classList.add('hidden');
+            }
+        }
+
+        // --- 3. Charts Initialization ---
+        // Chart 1: Risk Chart
+        const ctxRisk = document.getElementById('riskChart').getContext('2d');
+        new Chart(ctxRisk, {
+            type: 'doughnut',
+            data: {
+                labels: ['Web đen/Độc hại', 'Game/Mạng xã hội bạo lực', 'Lừa đảo/Dụ dỗ mạng', 'Nội dung an toàn'],
+                datasets: [{
+                    data: [35, 40, 15, 10],
+                    backgroundColor: ['#ef4444', '#f97316', '#a855f7', '#10b981'],
+                    borderWidth: 2,
+                    borderColor: '#ffffff'
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: { boxWidth: 12, font: { size: 11, family: 'sans-serif' }, padding: 15 }
+                    }
+                },
+                cutout: '65%'
+            }
+        });
+
+        // Chart 2: Business SaaS Margin Chart
+        const ctxBusiness = document.getElementById('businessChart').getContext('2d');
+        new Chart(ctxBusiness, {
+            type: 'bar',
+            data: {
+                labels: ['Doanh thu gói Pro (1 Năm)', 'Chi phí Server / Thiết bị', 'Chi phí Kỹ thuật Support', 'Lợi Nhuận Gộp Kỳ Vọng'],
+                datasets: [{
+                    label: 'Giá trị (VND)',
+                    data: [1290000, 180000, 90000, 1020000],
+                    backgroundColor: ['#1e3a8a', '#94a3b8', '#cbd5e1', '#f97316'],
+                    borderRadius: 6,
+                    borderWidth: 0
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                return context.raw.toLocaleString('vi-VN') + ' đ';
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            callback: function(value) {
+                                return (value / 1000).toLocaleString('vi-VN') + 'k';
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    </script>
+</body>
+</html>
